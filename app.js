@@ -1,12 +1,29 @@
 const app = require('express')();
 const http = require('node:http')
+const bodyparser =  require('body-parser')
+const cors = require('cors');
+const mongoose = require('mongoose');
+const router = require('./src/routes/todoRoutes');
+require('dotenv').config();
 
 const server = http.createServer(app);
+app.use(bodyparser.json())
+app.use(cors())
 
-app.use("/",(req,res)=>{
-    res.status(200).send("<h1>I am home page</h1>")
+const PORT =process.env.PORT || 5000
+const MONGOURL = process.env.MONGOURL;
+
+
+app.use(router);
+
+
+mongoose.connect(MONGOURL)
+.then(()=>{
+    console.log("database connected");
+    server.listen(PORT,()=>{
+        console.log(`Server is running on Port number ${PORT}`);
+    })
 })
-
-server.listen(4000,()=>{
-    console.log("Server is running on Port number 4000");
+.catch((error)=>{
+    console.log(`Something went wrong in database start ${error}`)
 })
